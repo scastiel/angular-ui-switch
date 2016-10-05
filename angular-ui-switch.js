@@ -1,11 +1,8 @@
 angular.module('uiSwitch', []).directive('switch', function () {
     return {
-        restrict: 'AE',
-        replace: true,
-        transclude: true,
+        restrict: 'E',
         scope: {
             ngDisabled: '=',
-            ngModel: '=',
             classes: '=',
             on: '=',
             off: '=',
@@ -14,20 +11,40 @@ angular.module('uiSwitch', []).directive('switch', function () {
         },
         template: `
             <span class="switch {{classes}}"
-                  ng-click="activated = !activated"
-                  ng-class="{ checked: ngModel, disabled: ngDisabled }">
+                  ng-click="toggle()"
+                  ng-class="{ checked: activated, disabled: ngDisabled }">
                 <small></small>
                 <input id="{{id}}"
                        name="{{name}}"
                        type="checkbox"
                        style="display: none"
                        ng-disabled="ngDisabled"
-                       ng-model="ngModel">
+                       ng-model="activated">
                 <span class="switch-text">
                     <span class="on" ng-if="on" ng-bind="on"></span>
                     <span class="off" ng-if="off" ng-bind="off"></span>
                 </span>
             </span>
-        `
+        `,
+        require: '?ngModel',
+        link(scope, element, attrs, ngModel) {
+            scope.activated = false;
+            if (!ngModel) {
+                return;
+            }
+            ngModel.$render = function() {
+                scope.activated = ngModel.$viewValue;
+            };
+            scope.$watch('activated', (newValue, oldValue) => {
+                if (newValue !== oldValue) {
+                    ngModel.$setViewValue(newValue);
+                }
+            });
+            scope.toggle = () => {
+                if (!scope.ngDisabled) {
+                    scope.activated = !scope.activated;
+                }
+            }
+        }
     };
 });
