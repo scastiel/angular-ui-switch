@@ -3,14 +3,14 @@ angular.module('uiSwitch', []).directive('switch', function () {
         restrict: 'E',
         scope: {
             ngDisabled: '=',
-            classes: '=',
+            class: '@',
             on: '=',
             off: '=',
             id: '=',
             name: '='
         },
         template: `
-            <span class="switch {{classes}}"
+            <span class="switch {{class}}"
                   ng-click="toggle()"
                   ng-class="{ checked: activated, disabled: ngDisabled }">
                 <small></small>
